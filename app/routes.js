@@ -1,4 +1,5 @@
 var Node = require('./models/Node');
+var User = require('./models/User');
 var CheckIn = require('./models/CheckIn');
 var ethereumjs = require('ethereumjs-util');
 
@@ -23,6 +24,31 @@ module.exports = function(app) {
       });
   });
 
+  app.get('/api/userToken', function(req, res) {
+    User.findOne({
+      publicKey: req.query.address
+    }, (err, response) => {
+        if (err) {
+          console.log(err);
+          return res.status(500).send();
+        }
+        res.status(200).json(response);
+      });
+  });
+
+  app.post('/api/userToken', function(req, res) {
+    User.create({
+      publicKey: req.body.address,
+      token: req.body.token
+    }, (err, response) => {
+        if (err) {
+          console.log(err);
+          return res.status(500).send();
+        }
+        res.status(200).json(response);
+      });
+  });
+
   app.post('/api/nodes', function(req, res) {
     Node.create({
       name: req.body.name,
@@ -39,13 +65,34 @@ module.exports = function(app) {
   });
 
   app.get('/api/checkins', function(req, res) {
-    CheckIn.find({}, (err, response) => {
+    var query;
+    if (req.query.address) {
+      User.findOne({
+        publicKey: req.query.address
+      }, (err, response) => {
+        if (err || !response || !response.token) {
+          console.log(err);
+          return res.status(500).send();
+        }
+        let token = response.token;
+        console.log(response)
+        CheckIn.find({ userToken: token }, (err, response) => {
+            if (err) {
+              console.log(err);
+              return res.status(500).send();
+            }
+            res.status(200).json(response);
+          });
+      });
+    } else {
+      CheckIn.find({ userToken: req.query.token }, (err, response) => {
         if (err) {
           console.log(err);
           return res.status(500).send();
         }
         res.status(200).json(response);
       });
+    }
   });
 
   app.post('/api/checkin', function(req, res) {
