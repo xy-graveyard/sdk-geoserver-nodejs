@@ -1,5 +1,6 @@
 var Node = require('./models/Node');
 var CheckIn = require('./models/CheckIn');
+var ethereumjs = require('ethereumjs-util');
 
 module.exports = function(app) {
 
@@ -48,8 +49,18 @@ module.exports = function(app) {
   });
 
   app.post('/api/checkin', function(req, res) {
-    //validate that signature is correct.
-    Node.find({ publicKey: req.body.publicKey }, (err, response) => {
+    // Compute the key used to sign the message
+    let signature = req.body.signature;
+    result = ethereumjs.fromRpcSig(signature.signature)
+    pub = ethereumjs.ecrecover(ethereumjs.toBuffer(signature.messageHash), result.v, result.r, result.s);
+    addrBuf = ethereumjs.pubToAddress(pub);
+    address = ethereumjs.toChecksumAddress(ethereumjs.bufferToHex(addrBuf));
+
+    if (address != req.body.node) {
+      // Incorrect public key
+      return res.status(500).send();
+    }
+    Node.find({ publicKey: address }, (err, response) => {
       if (!response || err) {
         console.log(err);
         return res.status(500).send();
