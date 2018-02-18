@@ -48,7 +48,7 @@ module.exports = function(app) {
   });
 
   app.post('/api/checkin', function(req, res) {
-    //validate that signature is correct
+    //validate that signature is correct.
     Node.find({ publicKey: req.body.publicKey }, (err, response) => {
       if (!response || err) {
         console.log(err);
