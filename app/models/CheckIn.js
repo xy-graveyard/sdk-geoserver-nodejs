@@ -4,7 +4,7 @@ var Node = require('./Node');
 
 const CheckInSchema = new mongoose.Schema({
   userToken: String,
-  timestamp: String,
+  timestamp: Number,
   signature: Object,
   node: { type: mongoose.Schema.Types.ObjectId, ref: 'Node' }
 });

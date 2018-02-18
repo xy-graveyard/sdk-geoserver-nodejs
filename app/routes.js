@@ -95,6 +95,44 @@ module.exports = function(app) {
     }
   });
 
+  // Confirms if a user was present at a location at a given time
+  // userAddress
+  // nodeAddress
+  // beginTime
+  // endTime
+
+  app.get('/api/confirm', function(req, res) {
+    User.findOne({
+      publicKey: req.query.userAddress
+    }, (err, response) => {
+      if (err || !response || !response.token) {
+        console.log(err);
+        return res.status(200).send('false');
+      }
+      let token = response.token;
+      Node.findOne({ publicKey: req.query.nodeAddress }, (err, response) => {
+        if (err || !response) {
+          console.log(err);
+          return res.status(200).send('false');
+        }
+        let id = response._id;
+        console.log(id)
+        console.log(token)
+        CheckIn.find({
+          userToken: token,
+          node: id,
+          timestamp: { $gte: req.query.beginTime, $lte: req.query.endTime },
+        }, (err, response) => {
+          if (err || !response || response.length == 0) {
+            console.log(err);
+            return res.status(200).send('false');
+          }
+          res.status(200).send(req.query.userAddress);
+        });
+      });
+    });
+  });
+
   app.post('/api/checkin', function(req, res) {
     // Compute the key used to sign the message
     let signature = req.body.signature;
@@ -107,7 +145,7 @@ module.exports = function(app) {
       // Incorrect public key
       return res.status(500).send();
     }
-    Node.find({ publicKey: address }, (err, response) => {
+    Node.findOne({ publicKey: address }, (err, response) => {
       if (!response || err) {
         console.log(err);
         return res.status(500).send();
