@@ -1,5 +1,5 @@
 {
-  "name": "hackathon-server",
+  "name": "geo-server",
   "main": "server.js",
   "dependencies": {
     "async": "^1.5.2",
