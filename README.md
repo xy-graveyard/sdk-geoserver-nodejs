@@ -1,6 +1,6 @@
 # Geo Server
 
-![logo](https://image.ibb.co/bwnLo7/geo_1_15.png)
+![logo](http://image.ibb.co/cd2E0x/geo_logo.png)
 
 The code for the Geo Server, allowing query of public Proof of Location data.
 
