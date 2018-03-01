@@ -136,23 +136,25 @@ module.exports = function(app) {
   app.post('/api/checkin', function(req, res) {
     // Compute the key used to sign the message
     let signature = req.body.signature;
+    let hashedMessage = '0x' + ethereumjs.sha3('\x19Ethereum Signed Message:\n' + signature.message.length + signature.message).toString('hex');
+    if (signature.messageHash != hashedMessage) {
+      console.log('Error: message does not match hash');
+      return res.status(500).send();
+    }
     result = ethereumjs.fromRpcSig(signature.signature)
     pub = ethereumjs.ecrecover(ethereumjs.toBuffer(signature.messageHash), result.v, result.r, result.s);
     addrBuf = ethereumjs.pubToAddress(pub);
     address = ethereumjs.toChecksumAddress(ethereumjs.bufferToHex(addrBuf));
 
-    if (address != req.body.node) {
-      // Incorrect public key
-      return res.status(500).send();
-    }
+    console.log('Passed verification.');
     Node.findOne({ publicKey: address }, (err, response) => {
       if (!response || err) {
         console.log(err);
         return res.status(500).send();
       }
       CheckIn.create({
-        userToken: req.body.userToken,
-        timestamp: req.body.timestamp,
+        userToken: signature.message.split('|')[0],
+        timestamp: signature.message.split('|')[1],
         signature: req.body.signature,
         node: response._id
       }, (err, checkin) => {
