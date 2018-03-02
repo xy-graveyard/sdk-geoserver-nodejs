@@ -1,6 +1,6 @@
 # Geo Server
 
-![logo](http://image.ibb.co/cd2E0x/geo_logo.png)
+![logo](https://raw.githubusercontent.com/GeoProof/geoproof.github.io/master/img/geo_3.png)
 
 The code for the Geo Server, allowing query of public Proof of Location data.
 
