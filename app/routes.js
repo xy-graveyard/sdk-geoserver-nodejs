@@ -66,9 +66,9 @@ module.exports = function(app) {
 
   app.get('/api/checkins', function(req, res) {
     var query;
-    if (req.query.address) {
+    if (req.query.paymentAddress) {
       User.findOne({
-        publicKey: req.query.address
+        publicKey: req.query.paymentAddress
       }, (err, response) => {
         if (err || !response || !response.address) {
           console.log(err);
