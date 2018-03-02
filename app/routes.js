@@ -24,7 +24,7 @@ module.exports = function(app) {
       });
   });
 
-  app.get('/api/userToken', function(req, res) {
+  app.get('/api/userAddress', function(req, res) {
     User.findOne({
       publicKey: req.query.address
     }, (err, response) => {
@@ -36,10 +36,10 @@ module.exports = function(app) {
       });
   });
 
-  app.post('/api/userToken', function(req, res) {
+  app.post('/api/userAddress', function(req, res) {
     User.create({
       publicKey: req.body.address,
-      token: req.body.token
+      address: req.body.address
     }, (err, response) => {
         if (err) {
           console.log(err);
@@ -70,13 +70,13 @@ module.exports = function(app) {
       User.findOne({
         publicKey: req.query.address
       }, (err, response) => {
-        if (err || !response || !response.token) {
+        if (err || !response || !response.address) {
           console.log(err);
           return res.status(500).send();
         }
-        let token = response.token;
+        let address = response.address;
         console.log(response)
-        CheckIn.find({ userToken: token }, (err, response) => {
+        CheckIn.find({ userAddress: address }, (err, response) => {
             if (err) {
               console.log(err);
               return res.status(500).send();
@@ -85,7 +85,7 @@ module.exports = function(app) {
           });
       });
     } else {
-      CheckIn.find({ userToken: req.query.token }, (err, response) => {
+      CheckIn.find({ userAddress: req.query.address }, (err, response) => {
         if (err) {
           console.log(err);
           return res.status(500).send();
@@ -105,11 +105,11 @@ module.exports = function(app) {
     User.findOne({
       publicKey: req.query.userAddress
     }, (err, response) => {
-      if (err || !response || !response.token) {
+      if (err || !response || !response.address) {
         console.log(err);
         return res.status(200).send('false');
       }
-      let token = response.token;
+      let address = response.address;
       Node.findOne({ publicKey: req.query.nodeAddress }, (err, response) => {
         if (err || !response) {
           console.log(err);
@@ -117,9 +117,9 @@ module.exports = function(app) {
         }
         let id = response._id;
         console.log(id)
-        console.log(token)
+        console.log(address)
         CheckIn.find({
-          userToken: token,
+          userAddress: address,
           node: id,
           timestamp: { $gte: req.query.beginTime, $lte: req.query.endTime },
         }, (err, response) => {
@@ -153,7 +153,7 @@ module.exports = function(app) {
         return res.status(500).send();
       }
       CheckIn.create({
-        userToken: signature.message.split('|')[0],
+        userAddress: signature.message.split('|')[0],
         timestamp: signature.message.split('|')[1],
         signature: req.body.signature,
         node: response._id
