@@ -1,5 +1,7 @@
 # Geo Server
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/XYOracleNetwork/sdk-geoserver-nodejs.svg)](https://greenkeeper.io/)
+
 ![logo](https://raw.githubusercontent.com/GeoProof/geoproof.github.io/master/img/geo_3.png)
 
 The code for the Geo Server, allowing query of public Proof of Location data.
